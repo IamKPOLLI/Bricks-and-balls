@@ -4,37 +4,74 @@ using UnityEngine;
 
 public class BallController : MonoBehaviour
 {
-    [SerializeField] private GameObject arrow;
+
+
+    public enum ballState
+    {
+        aim,
+        fire,
+        wait,
+        endShot
+    }
+
+    public ballState currentBallState;
+
+    private void Awake()
+    {
+        Messenger.AddListener(GameEvent.Ball_Stop, collisionWithStart);
+    }
+
+    private void OnDestroy()
+    {
+        Messenger.RemoveListener(GameEvent.Ball_Stop, collisionWithStart);
+    }
+
+    [SerializeField] private GameObject _arrow;
     [SerializeField] private Rigidbody2D _body;
+    [SerializeField] private NumberBallController numContr;
     private Vector2 _mousePosition;
-    private const float _startPosotionY = -4.063f;
+    private const float _startPosotionY = -6.63f;
     private const float _startPosotionX = 0f;
     private float _ballVelocityX;
     private float _ballVelocityY;
-    private bool _isCanClick;
+    public Vector2 ballVelocity;
     public float speed;
+    private int _damage;
 
     // Start is called before the first frame update
     void Start()
     {
-        transform.position = new Vector2 (_startPosotionX, _startPosotionY);
-        _isCanClick = true;
-        speed = 4f;
-        arrow.SetActive(false);
-
+        // TeleportToStart();
+        currentBallState = ballState.aim;
+        speed = 8f;
+        _arrow.SetActive(false);
+        _damage = 1;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(0) && _isCanClick)
+        switch (currentBallState)
         {
-            DrawArrow();
+            case ballState.aim:
+                if (Input.GetMouseButton(0))
+                {
+                    DrawArrow();
+                }
+                if (Input.GetMouseButtonUp(0) )
+                {
+                    Shot();
+                }
+                break;
+            case ballState.fire:
+                break;
+            case ballState.wait:
+                break;
+            case ballState.endShot:
+                break;
         }
-        if (Input.GetMouseButtonUp(0) && _isCanClick)
-        {
-            Shot();
-        }
+
+        
 
 
     }
@@ -48,25 +85,48 @@ public class BallController : MonoBehaviour
 
     public void DrawArrow()
     {
-        arrow.SetActive(true);
+        _arrow.SetActive(true);
         Vector2 tempMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         float diffX = _startPosotionX - tempMousePosition.x;
         float diffY = _startPosotionY - tempMousePosition.y;
         float theta = Mathf.Rad2Deg * Mathf.Atan(diffX / diffY);
-        arrow.transform.rotation = Quaternion.Euler(0f, 0f, -theta);
+        _arrow.transform.rotation = Quaternion.Euler(0f, 0f, -theta);
     }
 
     public void Shot()
     {
-        arrow.SetActive(false);
+        _arrow.SetActive(false);
         SetMousePosition();
         _ballVelocityX = _mousePosition.x - _startPosotionX;
         _ballVelocityY = _mousePosition.y - _startPosotionY;
-        Vector2 tempVelocity = new Vector2(_ballVelocityX, _ballVelocityY).normalized;
-        _body.velocity = tempVelocity * speed;
-        _isCanClick = false;
+         ballVelocity = new Vector2(_ballVelocityX, _ballVelocityY).normalized;
+        _body.velocity = ballVelocity * speed;
+        setCurrentState(ballState.fire);
+        numContr.setState(NumberBallController.NumControllerState.work);
     }
     
 
+    public void TeleportToStart()
+    {
+        transform.position = new Vector2(_startPosotionX, _startPosotionY);
+    }
 
+    public void setCurrentState(ballState state)
+    {
+        currentBallState = state;
+    }
+
+    public int getDamage()
+    {
+        return _damage;
+    }
+
+
+
+    public void collisionWithStart()
+    {
+        _body.velocity = Vector2.zero;
+        TeleportToStart();
+        setCurrentState(ballState.wait);
+    }
 }
