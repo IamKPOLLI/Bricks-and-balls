@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 3530126681406378628}
   m_Layer: 0
   m_Name: Laser Brick
-  m_TagString: Untagged
+  m_TagString: BonusBrick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -106,7 +106,7 @@ Transform:
   m_GameObject: {fileID: 3530126681406378624}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.5686226, y: 3.991014, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_Children:
   - {fileID: 3530126681711631051}
   m_Father: {fileID: 0}
@@ -202,6 +202,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _brickHealthText: {fileID: 3530126680177032121}
   brickHealth: 0
+  size: {x: 0, y: 0}
+  shift: {x: 0, y: 0, z: 0}
 --- !u!1 &3530126681711631044
 GameObject:
   m_ObjectHideFlags: 0

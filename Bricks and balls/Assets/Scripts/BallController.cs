@@ -30,7 +30,7 @@ public class BallController : MonoBehaviour
     [SerializeField] private Rigidbody2D _body;
     [SerializeField] private NumberBallController numContr;
     private Vector2 _mousePosition;
-    private const float _startPosotionY = -6.63f;
+    private const float _startPosotionY = -6.45f;
     private const float _startPosotionX = 0f;
     private float _ballVelocityX;
     private float _ballVelocityY;

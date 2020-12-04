@@ -2,18 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BombController : MonoBehaviour
 {
     [SerializeField] private Text _brickHealthText;
-    public int brickHealth;
+    public float brickHealth;
     public Vector2 size;
     public const int damage = 3;
-    
+    public Vector3 shift ;
+
+
+
+    private void Awake()
+    {
+        Messenger.AddListener(GameEvent.Shift_Down, shiftDown);
+    }
+
+    private void OnDestroy()
+    {
+        Messenger.RemoveListener(GameEvent.Shift_Down, shiftDown);
+    }
+
     void Start()
     {
-        setHealth(5);
+        
         size = new Vector2(3, 3);
+        shift = new Vector3(0, 0.72f, 0);
+       
     }
 
     // Update is called once per frame
@@ -24,10 +40,11 @@ public class BombController : MonoBehaviour
         {
             boom();
             Destroy(this.gameObject);
+            Messenger.Broadcast(GameEvent.Dead_Brick);
         }
     }
 
-    public void setHealth(int health)
+    public void setHealth(float health)
     {
         brickHealth = health;
     }
@@ -51,7 +68,12 @@ public class BombController : MonoBehaviour
             BallShadowController ballController = collision.gameObject.GetComponent<BallShadowController>();
             takeDamage(ballController.getDamage());
         }
+
+        
     }
+
+
+    
 
     public void boom()
     {
@@ -66,8 +88,20 @@ public class BombController : MonoBehaviour
         }
     }
 
+    public void shiftDown()
+    {
+        transform.position -= shift;
+        if (transform.position.y <= -6.28f)
+        {
+            SceneManager.LoadScene("SampleScene");
+        }
+    }
+    public void teleportToPosition(Vector2 pos)
+    {
+        transform.position = pos;
+    }
 
-    
+
 
 
 

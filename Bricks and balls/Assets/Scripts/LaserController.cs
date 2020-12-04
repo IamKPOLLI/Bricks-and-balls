@@ -2,20 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class LaserController : MonoBehaviour
 {
 
 
     [SerializeField] private Text _brickHealthText;
-    public int brickHealth;
+    public float brickHealth;
     public Vector2 size;
     public const int damage = 3;
+    public Vector3 shift;
+
+
+
+
+    private void Awake()
+    {
+        Messenger.AddListener(GameEvent.Shift_Down, shiftDown);
+    }
+
+    private void OnDestroy()
+    {
+        Messenger.RemoveListener(GameEvent.Shift_Down, shiftDown);
+    }
+
+
+
     // Start is called before the first frame update
     void Start()
     {
-        setHealth(5);
+        
         size = new Vector2(0.2f, 3f);
+        shift = new Vector3(0, 0.72f, 0);
     }
 
     // Update is called once per frame
@@ -25,10 +44,11 @@ public class LaserController : MonoBehaviour
         if (brickHealth <= 0)
         {
             Destroy(this.gameObject);
+            Messenger.Broadcast(GameEvent.Dead_Brick);
         }
     }
 
-    public void setHealth(int health)
+    public void setHealth(float health)
     {
         brickHealth = health;
     }
@@ -61,6 +81,7 @@ public class LaserController : MonoBehaviour
     public void boom()
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, size, 0);
+      //  Collider2D[] colliders1 = Physics2D.OverlapBoxAll(transform.position, size, 45);
         drawLines(transform.position, size);
         for (int i = 0; i < colliders.Length; i++)
         {
@@ -70,7 +91,17 @@ public class LaserController : MonoBehaviour
                 colliders[i].GetComponent<BrickHealthManager>().takeDamage(damage);
             }
         }
-        
+
+        //for (int i = 0; i < colliders1.Length; i++)
+        //{
+
+        //    if (colliders1[i].gameObject.tag == "Brick")
+        //    {
+        //        colliders1[i].GetComponent<BrickHealthManager>().takeDamage(damage);
+        //    }
+        //}
+
+
     }
 
     public void drawLines(Vector2 start, Vector2 size)
@@ -88,6 +119,20 @@ public class LaserController : MonoBehaviour
         ln.SetPosition(0, startPos);
         ln.SetPosition(1, stopPos);
         GameObject.Destroy(line, 0.2f);
+    }
+
+    public void shiftDown()
+    {
+        transform.position -= shift;
+        if (transform.position.y <= -6.28f)
+        {
+            SceneManager.LoadScene("SampleScene");
+        }
+    }
+
+    public void teleportToPosition(Vector2 pos)
+    {
+        transform.position = pos;
     }
 
 }

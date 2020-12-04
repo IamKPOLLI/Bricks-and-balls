@@ -16,7 +16,7 @@ public class BallStop : MonoBehaviour
     void Start()
     {
         _currentDestroyied = 0;
-        numberOfShadows = 10;
+        numberOfShadows = 5;
         _readyToShot = false;
     }
 
@@ -27,6 +27,7 @@ public class BallStop : MonoBehaviour
      if(_currentDestroyied == numberOfShadows && _readyToShot)
         {
             _currentDestroyied = 0;
+            Messenger.Broadcast(GameEvent.Shift_Down);
             _ball.setCurrentState(BallController.ballState.aim);
             _readyToShot = false;
         }   
@@ -45,7 +46,15 @@ public class BallStop : MonoBehaviour
             Destroy(collision.gameObject);
             _currentDestroyied++;
         }
+
+        if (collision.gameObject.tag == "Brick" || collision.gameObject.tag == "BonusBrick")
+        {
+            Debug.Log(120);
+        }
+
     }
+
+    
 
     void setNumberOfShadow(int number)
     {

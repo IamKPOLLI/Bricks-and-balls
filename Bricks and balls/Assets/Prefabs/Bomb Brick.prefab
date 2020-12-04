@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3025080889474716148}
   m_Layer: 0
   m_Name: Bomb Brick
-  m_TagString: Untagged
+  m_TagString: BonusBrick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -115,6 +115,7 @@ MonoBehaviour:
   _brickHealthText: {fileID: 3025080889511552809}
   brickHealth: 0
   size: {x: 0, y: 0}
+  shift: {x: 0, y: 0, z: 0}
 --- !u!1 &3025080889511552808
 GameObject:
   m_ObjectHideFlags: 0

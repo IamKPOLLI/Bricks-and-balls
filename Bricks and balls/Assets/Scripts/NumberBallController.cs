@@ -25,10 +25,10 @@ public class NumberBallController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _numberOfBalls = 10;
+        _numberOfBalls = 5;
         _currentNumberBalls = 0;
         _state = NumControllerState.not_work;
-        startPositions = new Vector2(0, -6.63f);
+        startPositions = new Vector2(0, -6.45f);
          
     }
 
@@ -53,8 +53,7 @@ public class NumberBallController : MonoBehaviour
         ball = Instantiate(_ballPrefab) as BallShadowController;
         ball.TeleportToPosition(startPositions);
         ball.AddMovement(mainBall.ballVelocity * mainBall.speed);
-        _currentNumberBalls++;
-        
+        _currentNumberBalls++;   
     }
 
     public void setState(NumberBallController.NumControllerState state)

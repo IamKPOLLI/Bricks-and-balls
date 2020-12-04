@@ -2,16 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BrickHealthManager : MonoBehaviour
 {
 
     [SerializeField] private Text _brickHealthText;
-    public int brickHealth;
+    public float brickHealth;
+    public Vector3 shift;
+
+
+    private void Awake()
+    {
+        Messenger.AddListener(GameEvent.Shift_Down, shiftDown);
+    }
+
+    private void OnDestroy()
+    {
+        Messenger.RemoveListener(GameEvent.Shift_Down, shiftDown);
+    }
     // Start is called before the first frame update
     void Start()
     {
-        setHealth(40);
+        
+        shift = new Vector3(0, 0.72f, 0);
     }
 
     // Update is called once per frame
@@ -21,6 +35,7 @@ public class BrickHealthManager : MonoBehaviour
         if(brickHealth <= 0)
         {
             Destroy(this.gameObject);
+            Messenger.Broadcast(GameEvent.Dead_Brick);
         }
     }
 
@@ -29,7 +44,7 @@ public class BrickHealthManager : MonoBehaviour
         brickHealth  -= damageToTake;
     }
 
-    public void setHealth(int health)
+    public void setHealth(float health)
     {
         brickHealth = health;
     }
@@ -47,6 +62,20 @@ public class BrickHealthManager : MonoBehaviour
             BallShadowController ballController = collision.gameObject.GetComponent<BallShadowController>();
             takeDamage(ballController.getDamage());
         }
+    }
+
+    public void shiftDown()
+    {
+        transform.position -= shift;
+        if (transform.position.y <= -6.28f)
+        {
+            SceneManager.LoadScene("SampleScene");
+        }
+    }
+
+    public void teleportToPosition(Vector2 pos)
+    {
+        transform.position = pos;
     }
 
 }
