@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BallShadowController : MonoBehaviour
 {
@@ -15,10 +13,10 @@ public class BallShadowController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    public int getDamage()
+    public int GetDamage()
     {
         return _damage;
     }

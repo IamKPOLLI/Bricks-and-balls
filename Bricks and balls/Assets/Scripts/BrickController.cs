@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-public class BrickHealthManager : MonoBehaviour
+public class BrickController : MonoBehaviour
 {
 
     [SerializeField] private Text _brickHealthText;
@@ -14,17 +12,17 @@ public class BrickHealthManager : MonoBehaviour
 
     private void Awake()
     {
-        Messenger.AddListener(GameEvent.Shift_Down, shiftDown);
+        Messenger.AddListener(GameEvent.Shift_Down, ShiftDown);
     }
 
     private void OnDestroy()
     {
-        Messenger.RemoveListener(GameEvent.Shift_Down, shiftDown);
+        Messenger.RemoveListener(GameEvent.Shift_Down, ShiftDown);
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+
         shift = new Vector3(0, 0.72f, 0);
     }
 
@@ -32,39 +30,39 @@ public class BrickHealthManager : MonoBehaviour
     void Update()
     {
         _brickHealthText.text = "" + brickHealth;
-        if(brickHealth <= 0)
+        if (brickHealth <= 0)
         {
             Destroy(this.gameObject);
             Messenger.Broadcast(GameEvent.Dead_Brick);
         }
     }
 
-    public void takeDamage(int damageToTake)
+    public void TakeDamage(int damageToTake)
     {
-        brickHealth  -= damageToTake;
+        brickHealth -= damageToTake;
     }
 
-    public void setHealth(float health)
+    public void SetHealth(float health)
     {
         brickHealth = health;
     }
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Ball")
+        if (collision.gameObject.CompareTag("Ball"))
         {
             BallController ballController = collision.gameObject.GetComponent<BallController>();
-            takeDamage(ballController.getDamage());
+            TakeDamage(ballController.GetDamage());
         }
 
-        if (collision.gameObject.tag == "BallShadow")
+        if (collision.gameObject.CompareTag("BallShadow"))
         {
             BallShadowController ballController = collision.gameObject.GetComponent<BallShadowController>();
-            takeDamage(ballController.getDamage());
+            TakeDamage(ballController.GetDamage());
         }
     }
 
-    public void shiftDown()
+    public void ShiftDown()
     {
         transform.position -= shift;
         if (transform.position.y <= -6.28f)
@@ -73,7 +71,7 @@ public class BrickHealthManager : MonoBehaviour
         }
     }
 
-    public void teleportToPosition(Vector2 pos)
+    public void TeleportToPosition(Vector2 pos)
     {
         transform.position = pos;
     }

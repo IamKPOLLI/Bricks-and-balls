@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BallController : MonoBehaviour
 {
 
 
-    public enum ballState
+    public enum BallState
     {
         aim,
         fire,
@@ -14,24 +12,24 @@ public class BallController : MonoBehaviour
         endShot
     }
 
-    public ballState currentBallState;
+    public BallState currentBallState;
 
     private void Awake()
     {
-        Messenger.AddListener(GameEvent.Ball_Stop, collisionWithStart);
+        Messenger.AddListener(GameEvent.Ball_Stop, CollisionWithStart);
     }
 
     private void OnDestroy()
     {
-        Messenger.RemoveListener(GameEvent.Ball_Stop, collisionWithStart);
+        Messenger.RemoveListener(GameEvent.Ball_Stop, CollisionWithStart);
     }
 
     [SerializeField] private GameObject _arrow;
     [SerializeField] private Rigidbody2D _body;
     [SerializeField] private NumberBallController numContr;
     private Vector2 _mousePosition;
-    private const float _startPosotionY = -6.45f;
-    private const float _startPosotionX = 0f;
+    public Vector2 currentPosBeforeShot;
+    private Vector2 _startPosition = new Vector2(0, -6.45f);
     private float _ballVelocityX;
     private float _ballVelocityY;
     public Vector2 ballVelocity;
@@ -42,7 +40,8 @@ public class BallController : MonoBehaviour
     void Start()
     {
         // TeleportToStart();
-        currentBallState = ballState.aim;
+        currentPosBeforeShot = _startPosition;
+        currentBallState = BallState.aim;
         speed = 8f;
         _arrow.SetActive(false);
         _damage = 1;
@@ -53,42 +52,42 @@ public class BallController : MonoBehaviour
     {
         switch (currentBallState)
         {
-            case ballState.aim:
+            case BallState.aim:
                 if (Input.GetMouseButton(0))
                 {
                     DrawArrow();
                 }
-                if (Input.GetMouseButtonUp(0) )
+                if (Input.GetMouseButtonUp(0))
                 {
                     Shot();
                 }
                 break;
-            case ballState.fire:
+            case BallState.fire:
                 break;
-            case ballState.wait:
+            case BallState.wait:
                 break;
-            case ballState.endShot:
+            case BallState.endShot:
                 break;
         }
 
-        
+
 
 
     }
 
     public void SetMousePosition()
     {
-       _mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        _mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 
-    
+
 
     public void DrawArrow()
     {
         _arrow.SetActive(true);
         Vector2 tempMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        float diffX = _startPosotionX - tempMousePosition.x;
-        float diffY = _startPosotionY - tempMousePosition.y;
+        float diffX = transform.position.x - tempMousePosition.x;
+        float diffY = transform.position.y - tempMousePosition.y;
         float theta = Mathf.Rad2Deg * Mathf.Atan(diffX / diffY);
         _arrow.transform.rotation = Quaternion.Euler(0f, 0f, -theta);
     }
@@ -97,36 +96,37 @@ public class BallController : MonoBehaviour
     {
         _arrow.SetActive(false);
         SetMousePosition();
-        _ballVelocityX = _mousePosition.x - _startPosotionX;
-        _ballVelocityY = _mousePosition.y - _startPosotionY;
-         ballVelocity = new Vector2(_ballVelocityX, _ballVelocityY).normalized;
+        _ballVelocityX = _mousePosition.x - transform.position.x;
+        _ballVelocityY = _mousePosition.y - transform.position.y;
+        ballVelocity = new Vector2(_ballVelocityX, _ballVelocityY).normalized;
         _body.velocity = ballVelocity * speed;
-        setCurrentState(ballState.fire);
-        numContr.setState(NumberBallController.NumControllerState.work);
+        SetCurrentState(BallState.fire);
+        numContr.SetState(NumberBallController.NumControllerState.work);
     }
-    
+
 
     public void TeleportToStart()
     {
-        transform.position = new Vector2(_startPosotionX, _startPosotionY);
+        transform.position = _startPosition;
     }
 
-    public void setCurrentState(ballState state)
+    public void SetCurrentState(BallState state)
     {
         currentBallState = state;
     }
 
-    public int getDamage()
+    public int GetDamage()
     {
         return _damage;
     }
 
 
 
-    public void collisionWithStart()
+    public void CollisionWithStart()
     {
         _body.velocity = Vector2.zero;
-        TeleportToStart();
-        setCurrentState(ballState.wait);
+        currentPosBeforeShot = transform.position;
+        //   TeleportToStart();
+        SetCurrentState(BallState.wait);
     }
 }

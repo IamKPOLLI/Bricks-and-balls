@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class BombController : MonoBehaviour
 {
@@ -10,26 +8,26 @@ public class BombController : MonoBehaviour
     public float brickHealth;
     public Vector2 size;
     public const int damage = 3;
-    public Vector3 shift ;
+    public Vector3 shift;
 
 
 
     private void Awake()
     {
-        Messenger.AddListener(GameEvent.Shift_Down, shiftDown);
+        Messenger.AddListener(GameEvent.Shift_Down, ShiftDown);
     }
 
     private void OnDestroy()
     {
-        Messenger.RemoveListener(GameEvent.Shift_Down, shiftDown);
+        Messenger.RemoveListener(GameEvent.Shift_Down, ShiftDown);
     }
 
     void Start()
     {
-        
+
         size = new Vector2(3, 3);
         shift = new Vector3(0, 0.72f, 0);
-       
+
     }
 
     // Update is called once per frame
@@ -38,7 +36,7 @@ public class BombController : MonoBehaviour
         _brickHealthText.text = "" + brickHealth;
         if (brickHealth <= 0)
         {
-            boom();
+            Boom();
             Destroy(this.gameObject);
             Messenger.Broadcast(GameEvent.Dead_Brick);
         }
@@ -55,40 +53,41 @@ public class BombController : MonoBehaviour
     }
 
 
-    public void OnCollisionEnter2D(Collision2D collision)
+
+
+
+    public void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Ball")
+        if (collision.gameObject.CompareTag("Ball"))
         {
             BallController ballController = collision.gameObject.GetComponent<BallController>();
-            takeDamage(ballController.getDamage());
+            takeDamage(ballController.GetDamage());
         }
 
-        if (collision.gameObject.tag == "BallShadow")
+        if (collision.gameObject.CompareTag("BallShadow"))
         {
             BallShadowController ballController = collision.gameObject.GetComponent<BallShadowController>();
-            takeDamage(ballController.getDamage());
+            takeDamage(ballController.GetDamage());
         }
-
-        
     }
 
 
-    
 
-    public void boom()
+
+    public void Boom()
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, size, 360);
         for (int i = 0; i < colliders.Length; i++)
         {
-           
-            if (colliders[i].gameObject.tag == "Brick")
+
+            if (colliders[i].gameObject.CompareTag("Brick"))
             {
-                colliders[i].GetComponent<BrickHealthManager>().takeDamage(damage);
+                colliders[i].GetComponent<BrickController>().TakeDamage(damage);
             }
         }
     }
 
-    public void shiftDown()
+    public void ShiftDown()
     {
         transform.position -= shift;
         if (transform.position.y <= -6.28f)

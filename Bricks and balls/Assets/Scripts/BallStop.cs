@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BallStop : MonoBehaviour
 {
@@ -16,7 +14,7 @@ public class BallStop : MonoBehaviour
     void Start()
     {
         _currentDestroyied = 0;
-        numberOfShadows = 5;
+        numberOfShadows = 3;
         _readyToShot = false;
     }
 
@@ -24,41 +22,34 @@ public class BallStop : MonoBehaviour
 
     void Update()
     {
-     if(_currentDestroyied == numberOfShadows && _readyToShot)
+        if (_currentDestroyied == numberOfShadows && _readyToShot)
         {
             _currentDestroyied = 0;
             Messenger.Broadcast(GameEvent.Shift_Down);
-            _ball.setCurrentState(BallController.ballState.aim);
+            _ball.SetCurrentState(BallController.BallState.aim);
             _readyToShot = false;
-        }   
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "Ball")
+
+        
+        if (collision.gameObject.CompareTag("Ball"))
         {
             Messenger.Broadcast(GameEvent.Ball_Stop);
-            _readyToShot = true;    
+            _readyToShot = true;
         }
 
-        if (collision.gameObject.tag == "BallShadow")
+        if (collision.gameObject.CompareTag("BallShadow"))
         {
             Destroy(collision.gameObject);
             _currentDestroyied++;
         }
 
-        if (collision.gameObject.tag == "Brick" || collision.gameObject.tag == "BonusBrick")
-        {
-            Debug.Log(120);
-        }
+        
 
     }
 
-    
-
-    void setNumberOfShadow(int number)
-    {
-        numberOfShadows = number;
-    }
 
 }

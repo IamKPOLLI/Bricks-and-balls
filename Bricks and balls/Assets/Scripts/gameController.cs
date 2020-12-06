@@ -1,28 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class gameController : MonoBehaviour
+public class GameController : MonoBehaviour
 {
 
 
-    public Vector2[] map = new  Vector2[] { new Vector2(1,14), new Vector2(1, 5), new Vector2(1, 14), new Vector2(1, 10), new Vector2(1, 8), new Vector2(1, 8), new Vector2(1, 5), new Vector2(3, 8), new Vector2(0, 0), new Vector2(0, 0), new Vector2(3, 3), new Vector2(2, 6), new Vector2(2, 6) };
+    public Vector2[] map = new Vector2[] { new Vector2(1, 14), new Vector2(1, 5), new Vector2(1, 14), new Vector2(1, 10), new Vector2(1, 8), new Vector2(1, 8), new Vector2(1, 5), new Vector2(3, 8), new Vector2(0, 0), new Vector2(0, 0), new Vector2(3, 3), new Vector2(2, 6), new Vector2(2, 6) };
     public Vector2 firstBlockPosition;
-    
+
     public int numberOfBricks = 0;
 
-    [SerializeField] private BrickHealthManager _brickPrefab;
+    [SerializeField] private BrickController _brickPrefab;
     [SerializeField] private BombController _bombPrefab;
     [SerializeField] private LaserController _laserPrefab;
 
-    public enum gameState
+    public enum GameState
     {
         generate,
         play
     }
 
-    public gameState currentGameState;
+    public GameState currentGameState;
 
 
 
@@ -30,46 +28,46 @@ public class gameController : MonoBehaviour
 
     private void Awake()
     {
-        Messenger.AddListener(GameEvent.Dead_Brick, deadBriks);
+        Messenger.AddListener(GameEvent.Dead_Brick, DeadBriks);
     }
 
     private void OnDestroy()
     {
-        Messenger.RemoveListener(GameEvent.Dead_Brick, deadBriks);
+        Messenger.RemoveListener(GameEvent.Dead_Brick, DeadBriks);
     }
 
     // Start is called before the first frame update
     void Start()
     {
         firstBlockPosition = new Vector2(-4.5f, 8.36f);
-        currentGameState = gameState.generate;
+        currentGameState = GameState.generate;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        if(currentGameState==gameState.generate)
+
+        if (currentGameState == GameState.generate)
         {
-            generateMap(map);
-            currentGameState = gameState.play;
+            GenerateMap(map);
+            currentGameState = GameState.play;
         }
 
 
     }
 
 
-    public void generateMap(Vector2[] map)
+    public void GenerateMap(Vector2[] map)
     {
 
         Vector2 currentBlockPosition = new Vector2(firstBlockPosition.x, firstBlockPosition.y);
         int X = 0;
-      
+
 
         Debug.Log(map.Length);
         for (int i = 0; i < map.Length; i++)
         {
-            
+
             switch (map[i].x)
             {
                 case 0:
@@ -79,23 +77,23 @@ public class gameController : MonoBehaviour
                     {
                         X = 0;
                         currentBlockPosition.x = firstBlockPosition.x;
-                   
+
                     }
                     break;
                 case 1:
-                    BrickHealthManager brick;
-                    brick = Instantiate(_brickPrefab) as BrickHealthManager; 
-                    brick.teleportToPosition(currentBlockPosition);
-                    brick.setHealth(map[i].y);
+                    BrickController brick;
+                    brick = Instantiate(_brickPrefab) as BrickController;
+                    brick.TeleportToPosition(currentBlockPosition);
+                    brick.SetHealth(map[i].y);
                     currentBlockPosition.x += 1.3f;
                     numberOfBricks++;
                     X++;
-                    if(X == 8)
+                    if (X == 8)
                     {
                         X = 0;
                         currentBlockPosition.x = firstBlockPosition.x;
                         currentBlockPosition.y -= 1.3f;
-                        
+
                     }
                     break;
 
@@ -119,8 +117,8 @@ public class gameController : MonoBehaviour
                 case 3:
                     LaserController laser;
                     laser = Instantiate(_laserPrefab) as LaserController;
-                    laser.teleportToPosition(currentBlockPosition);
-                    laser.setHealth(map[i].y);
+                    laser.TeleportToPosition(currentBlockPosition);
+                    laser.SetHealth(map[i].y);
                     currentBlockPosition.x += 1.3f;
                     numberOfBricks++;
                     X++;
@@ -137,8 +135,8 @@ public class gameController : MonoBehaviour
 
 
             }
-           
-       
+
+
 
         }
 
@@ -146,19 +144,19 @@ public class gameController : MonoBehaviour
 
     }
 
-    public void deadBriks()
+    public void DeadBriks()
     {
         numberOfBricks--;
         if (numberOfBricks <= 0)
         {
-            restart();
+            Restart();
         }
     }
 
 
-    public void restart()
+    public void Restart()
     {
         SceneManager.LoadScene("SampleScene");
     }
-    
+
 }
